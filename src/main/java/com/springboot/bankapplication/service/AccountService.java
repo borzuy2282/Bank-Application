@@ -94,8 +94,19 @@ public class AccountService {
         if(from.getBalance().compareTo(transferFundDto.amount()) < 0){
             throw new InsufficientAmountException("Insufficient amount!");
         }
-        from.setBalance(from.getBalance().subtract(transferFundDto.amount()));
-        to.setBalance(to.getBalance().add(transferFundDto.amount()));
+        //changing the balance for users
+        from.setBalance(from.getBalance()
+                .subtract(transferFundDto.amount()));
+        to.setBalance(to.getBalance()
+                .add(transferFundDto.amount()));
+        //saving transactions
+        saveTransaction(from.getId(),
+                transferFundDto.amount().multiply(BigDecimal.valueOf(-1)),
+                TransactionType.OUTCOMING_TRANSFER);
+        saveTransaction(to.getId(),
+                transferFundDto.amount(),
+                TransactionType.INCOMING_TRANSFER);
+
         accountRepository.save(from);
         accountRepository.save(to);
     }
