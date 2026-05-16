@@ -2,6 +2,7 @@ package com.springboot.bankapplication.service;
 
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.entity.Account;
+import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.mapper.AccountMapper;
 import com.springboot.bankapplication.repository.AccountRepository;
 import jakarta.transaction.Transactional;
@@ -23,5 +24,11 @@ public class AccountService {
         Account account = accountMapper.toEntity(accountDto);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
+    }
+
+    public AccountDto getAccount(Long id){
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
+        return accountMapper.toDto(account);
     }
 }
