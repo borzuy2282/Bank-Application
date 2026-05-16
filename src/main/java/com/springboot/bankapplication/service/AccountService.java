@@ -66,4 +66,8 @@ public class AccountService {
                 .map(accountMapper::toDto)
                 .toList();
     }
+
+    public void deleteAccount(Long id){
+        accountRepository.deleteById(id);
+    }
 }

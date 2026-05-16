@@ -6,6 +6,7 @@ import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,12 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAllAccounts(){
         return ResponseEntity.ok(accountService.getAllAccounts());
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id){
+        accountService.deleteAccount(id);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
