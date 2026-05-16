@@ -3,6 +3,7 @@ package com.springboot.bankapplication.controller;
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.exception.ErrorDetails;
+import com.springboot.bankapplication.exception.IncorrectRequestException;
 import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -45,13 +46,13 @@ public class AccountController {
 
     @PutMapping("{id}/deposit")
     public ResponseEntity<AccountDto> deposit(@PathVariable Long id, @RequestBody Map<String, Double> request){
-        if(!request.containsKey("amount")) return ResponseEntity.badRequest().build();
+        if(!request.containsKey("amount")) throw new IncorrectRequestException("Bad key name was provided");
         return ResponseEntity.ok(accountService.deposit(id, request.get("amount")));
     }
 
     @PutMapping("{id}/withdraw")
     public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, Double> request){
-        if(!request.containsKey("amount")) return ResponseEntity.badRequest().build();
+        if(!request.containsKey("amount")) throw new IncorrectRequestException("Bad key name was provided");
         return ResponseEntity.ok(accountService.withdraw(id, request.get("amount")));
     }
 
@@ -88,6 +89,20 @@ public class AccountController {
                 ex.getMessage(),
                 webRequest.getDescription(false),
                 "INSUFFICIENT_AMOUNT"
+        );
+        return ResponseEntity
+                .badRequest()
+                .body(errorDetails);
+    }
+
+    @ExceptionHandler(IncorrectRequestException.class)
+    public ResponseEntity<ErrorDetails> handleIncorrectRequestException(IncorrectRequestException ex,
+                                                                        WebRequest webRequest){
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                webRequest.getDescription(false),
+                "INCORRECT_REQUEST"
         );
         return ResponseEntity
                 .badRequest()
