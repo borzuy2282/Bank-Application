@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -50,6 +51,10 @@ public class AccountController {
         return ResponseEntity.ok(accountService.withdraw(id, request.get("amount")));
     }
 
+    @GetMapping
+    public ResponseEntity<List<AccountDto>> getAllAccounts(){
+        return ResponseEntity.ok(accountService.getAllAccounts());
+    }
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleAccountNotFoundException(AccountNotFoundException ex){

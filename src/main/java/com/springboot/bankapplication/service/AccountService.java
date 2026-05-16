@@ -9,6 +9,9 @@ import com.springboot.bankapplication.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AccountService {
 
@@ -55,5 +58,12 @@ public class AccountService {
         account.setBalance(account.getBalance() - amount);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
+    }
+
+    public List<AccountDto> getAllAccounts(){
+        return accountRepository.findAll()
+                .stream()
+                .map(accountMapper::toDto)
+                .toList();
     }
 }
