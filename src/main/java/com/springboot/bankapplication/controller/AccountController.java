@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +48,13 @@ public class AccountController {
     }
 
     @PutMapping("{id}/deposit")
-    public ResponseEntity<AccountDto> deposit(@PathVariable Long id, @RequestBody Map<String, Double> request){
+    public ResponseEntity<AccountDto> deposit(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
         if(!request.containsKey("amount")) throw new IncorrectRequestException("Bad key name was provided");
         return ResponseEntity.ok(accountService.deposit(id, request.get("amount")));
     }
 
     @PutMapping("{id}/withdraw")
-    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, Double> request){
+    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, BigDecimal> request){
         if(!request.containsKey("amount")) throw new IncorrectRequestException("Bad key name was provided");
         return ResponseEntity.ok(accountService.withdraw(id, request.get("amount")));
     }

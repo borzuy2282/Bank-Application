@@ -14,6 +14,7 @@ import com.springboot.bankapplication.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -46,25 +47,25 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountDto deposit(Long id, double amount){
+    public AccountDto deposit(Long id, BigDecimal amount){
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
-        account.setBalance(account.getBalance() + amount);
+        account.setBalance(account.getBalance().add(amount));
         saveTransaction(account.getId(), amount, TransactionType.DEPOSIT);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
     }
 
     @Transactional
-    public AccountDto withdraw(Long id, double amount){
+    public AccountDto withdraw(Long id, BigDecimal amount){
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
-        if(account.getBalance() < amount){
+        if(account.getBalance().compareTo(amount) < 0){
             throw new InsufficientAmountException("Insufficient amount!");
         }
-        account.setBalance(account.getBalance() - amount);
+        account.setBalance(account.getBalance().subtract(amount));
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
     }
@@ -89,16 +90,16 @@ public class AccountService {
         Account to = accountRepository
                 .findById(transferFundDto.toId())
                 .orElseThrow(() -> new AccountNotFoundException("Account, which tries to obtain, was not found!"));
-        if(from.getBalance() < transferFundDto.amount()){
+        if(from.getBalance().compareTo(transferFundDto.amount()) < 0){
             throw new InsufficientAmountException("Insufficient amount!");
         }
-        from.setBalance(from.getBalance() - transferFundDto.amount());
-        to.setBalance(to.getBalance() + transferFundDto.amount());
+        from.setBalance(from.getBalance().subtract(transferFundDto.amount()));
+        to.setBalance(to.getBalance().add(transferFundDto.amount()));
         accountRepository.save(from);
         accountRepository.save(to);
     }
 
-    private void saveTransaction(Long accountId, double amount, TransactionType type){
+    private void saveTransaction(Long accountId, BigDecimal amount, TransactionType type){
         Transaction transaction = new Transaction();
         transaction.setAccountId(accountId);
         transaction.setType(type);

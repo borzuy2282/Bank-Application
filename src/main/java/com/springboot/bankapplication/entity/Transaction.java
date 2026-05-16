@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Table(name = "transaction")
@@ -27,6 +28,6 @@ public class Transaction {
     private Long accountId;
     @Enumerated(EnumType.STRING)
     private TransactionType type;
-    private double amount;
+    private BigDecimal amount;
     private LocalDateTime timestamp;
 }

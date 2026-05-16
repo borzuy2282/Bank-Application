@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Table(name = "account")
 @Entity
 @Getter
@@ -25,5 +27,5 @@ public class Account {
 
     @Column(name = "holder_name")
     private String holderName;
-    private double balance;
+    private BigDecimal balance;
 }
