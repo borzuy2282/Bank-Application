@@ -27,8 +27,18 @@ public class AccountService {
     }
 
     public AccountDto getAccount(Long id){
-        Account account = accountRepository.findById(id)
+        Account account = accountRepository
+                .findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
         return accountMapper.toDto(account);
+    }
+
+    public AccountDto deposit(Long id, double amount){
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
+        account.setBalance(account.getBalance() + amount);
+        Account savedAccount = accountRepository.save(account);
+        return accountMapper.toDto(savedAccount);
     }
 }
