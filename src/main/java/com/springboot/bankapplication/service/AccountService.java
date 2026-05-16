@@ -66,7 +66,7 @@ public class AccountService {
             throw new InsufficientAmountException("Insufficient amount!");
         }
         account.setBalance(account.getBalance().subtract(amount));
-        saveTransaction(account.getId(), amount, TransactionType.WITHDRAW);
+        saveTransaction(account.getId(), amount.multiply(BigDecimal.valueOf(-1)), TransactionType.WITHDRAW);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
     }
