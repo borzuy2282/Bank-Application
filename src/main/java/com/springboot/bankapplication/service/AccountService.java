@@ -3,27 +3,32 @@ package com.springboot.bankapplication.service;
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.dto.TransferFundDto;
 import com.springboot.bankapplication.entity.Account;
+import com.springboot.bankapplication.entity.Transaction;
+import com.springboot.bankapplication.entity.TransactionType;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.exception.WrongTransferOperationException;
 import com.springboot.bankapplication.mapper.AccountMapper;
 import com.springboot.bankapplication.repository.AccountRepository;
+import com.springboot.bankapplication.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
 
     private final AccountMapper accountMapper;
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
-    public AccountService(AccountMapper accountMapper, AccountRepository accountRepository) {
+    public AccountService(AccountMapper accountMapper, AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountMapper = accountMapper;
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Transactional
@@ -46,6 +51,7 @@ public class AccountService {
                 .findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
         account.setBalance(account.getBalance() + amount);
+        saveTransaction(account.getId(), amount, TransactionType.DEPOSIT);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
     }
@@ -90,5 +96,14 @@ public class AccountService {
         to.setBalance(to.getBalance() + transferFundDto.amount());
         accountRepository.save(from);
         accountRepository.save(to);
+    }
+
+    private void saveTransaction(Long accountId, double amount, TransactionType type){
+        Transaction transaction = new Transaction();
+        transaction.setAccountId(accountId);
+        transaction.setType(type);
+        transaction.setAmount(amount);
+        transaction.setTimestamp(LocalDateTime.now());
+        transactionRepository.save(transaction);
     }
 }

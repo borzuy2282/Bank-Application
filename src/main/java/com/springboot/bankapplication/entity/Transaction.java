@@ -1,6 +1,8 @@
 package com.springboot.bankapplication.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long accountId;
+    @Enumerated(EnumType.STRING)
     private TransactionType type;
     private double amount;
     private LocalDateTime timestamp;
