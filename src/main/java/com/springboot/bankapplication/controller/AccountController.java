@@ -2,6 +2,7 @@ package com.springboot.bankapplication.controller;
 
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
+import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +38,28 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAccount(id));
     }
 
-    @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleAccountNotFoundException(AccountNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error:", ex.getMessage()));
-    }
-
     @PutMapping("{id}/deposit")
     public ResponseEntity<AccountDto> deposit(@PathVariable Long id, @RequestBody Map<String, Double> request){
         return ResponseEntity.ok(accountService.deposit(id, request.get("amount")));
+    }
+
+    @PutMapping("{id}/withdraw")
+    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, Double> request){
+        return ResponseEntity.ok(accountService.withdraw(id, request.get("amount")));
+    }
+
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAccountNotFoundException(AccountNotFoundException ex){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error:", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InsufficientAmountException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientAmountException(InsufficientAmountException ex){
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("error:", ex.getMessage()));
     }
 }

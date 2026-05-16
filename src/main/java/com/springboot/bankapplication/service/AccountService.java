@@ -3,6 +3,7 @@ package com.springboot.bankapplication.service;
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.entity.Account;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
+import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.mapper.AccountMapper;
 import com.springboot.bankapplication.repository.AccountRepository;
 import jakarta.transaction.Transactional;
@@ -33,11 +34,25 @@ public class AccountService {
         return accountMapper.toDto(account);
     }
 
+    @Transactional
     public AccountDto deposit(Long id, double amount){
         Account account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
         account.setBalance(account.getBalance() + amount);
+        Account savedAccount = accountRepository.save(account);
+        return accountMapper.toDto(savedAccount);
+    }
+
+    @Transactional
+    public AccountDto withdraw(Long id, double amount){
+        Account account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account was not found!"));
+        if(account.getBalance() < amount){
+            throw new InsufficientAmountException("Insufficient amount!");
+        }
+        account.setBalance(account.getBalance() - amount);
         Account savedAccount = accountRepository.save(account);
         return accountMapper.toDto(savedAccount);
     }
