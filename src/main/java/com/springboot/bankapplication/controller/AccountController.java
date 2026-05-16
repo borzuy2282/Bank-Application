@@ -1,6 +1,7 @@
 package com.springboot.bankapplication.controller;
 
 import com.springboot.bankapplication.dto.AccountDto;
+import com.springboot.bankapplication.dto.TransactionDto;
 import com.springboot.bankapplication.dto.TransferFundDto;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.exception.ErrorDetails;
@@ -74,6 +75,11 @@ public class AccountController {
     public ResponseEntity<String> transferFund(@RequestBody TransferFundDto transferFundDto){
         accountService.transferFunds(transferFundDto);
         return ResponseEntity.ok("Transfer was successful!");
+    }
+
+    @GetMapping("{id}/transactions")
+    public ResponseEntity<List<TransactionDto>> getAccountTransactions(@PathVariable(name = "id") Long accountId){
+        return ResponseEntity.ok(accountService.getAccountTransactions(accountId));
     }
 
     @ExceptionHandler(AccountNotFoundException.class)

@@ -1,6 +1,7 @@
 package com.springboot.bankapplication.service;
 
 import com.springboot.bankapplication.dto.AccountDto;
+import com.springboot.bankapplication.dto.TransactionDto;
 import com.springboot.bankapplication.dto.TransferFundDto;
 import com.springboot.bankapplication.entity.Account;
 import com.springboot.bankapplication.entity.Transaction;
@@ -9,6 +10,7 @@ import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.exception.WrongTransferOperationException;
 import com.springboot.bankapplication.mapper.AccountMapper;
+import com.springboot.bankapplication.mapper.TransactionMapper;
 import com.springboot.bankapplication.repository.AccountRepository;
 import com.springboot.bankapplication.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -25,11 +27,13 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionMapper transactionMapper;
 
-    public AccountService(AccountMapper accountMapper, AccountRepository accountRepository, TransactionRepository transactionRepository) {
+    public AccountService(AccountMapper accountMapper, AccountRepository accountRepository, TransactionRepository transactionRepository, TransactionMapper transactionMapper) {
         this.accountMapper = accountMapper;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionMapper = transactionMapper;
     }
 
     @Transactional
@@ -109,6 +113,13 @@ public class AccountService {
 
         accountRepository.save(from);
         accountRepository.save(to);
+    }
+
+    public List<TransactionDto> getAccountTransactions(Long accountId){
+        return transactionRepository.findByAccountIdOrderByTimestampDesc(accountId)
+                .stream()
+                .map(transactionMapper::toDto)
+                .toList();
     }
 
     private void saveTransaction(Long accountId, BigDecimal amount, TransactionType type){
