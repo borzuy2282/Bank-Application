@@ -1,10 +1,12 @@
 package com.springboot.bankapplication.controller;
 
 import com.springboot.bankapplication.dto.AccountDto;
+import com.springboot.bankapplication.dto.TransferFundDto;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
 import com.springboot.bankapplication.exception.ErrorDetails;
 import com.springboot.bankapplication.exception.IncorrectRequestException;
 import com.springboot.bankapplication.exception.InsufficientAmountException;
+import com.springboot.bankapplication.exception.WrongTransferOperationException;
 import com.springboot.bankapplication.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +69,12 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transferFund(@RequestBody TransferFundDto transferFundDto){
+        accountService.transferFunds(transferFundDto);
+        return ResponseEntity.ok("Transfer was successful!");
+    }
+
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorDetails> handleAccountNotFoundException(AccountNotFoundException ex,
                                                                        WebRequest webRequest){
@@ -107,5 +115,17 @@ public class AccountController {
         return ResponseEntity
                 .badRequest()
                 .body(errorDetails);
+    }
+
+    @ExceptionHandler(WrongTransferOperationException.class)
+    public ResponseEntity<ErrorDetails> handleWrongTransferOperationException(WrongTransferOperationException ex,
+                                                                              WebRequest webRequest){
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                webRequest.getDescription(false),
+                "WRONG_TRANSFER_OPERATION"
+        );
+        return ResponseEntity.badRequest().body(errorDetails);
     }
 }
