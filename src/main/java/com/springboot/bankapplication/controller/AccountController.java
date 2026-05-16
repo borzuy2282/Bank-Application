@@ -40,11 +40,13 @@ public class AccountController {
 
     @PutMapping("{id}/deposit")
     public ResponseEntity<AccountDto> deposit(@PathVariable Long id, @RequestBody Map<String, Double> request){
+        if(!request.containsKey("amount")) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(accountService.deposit(id, request.get("amount")));
     }
 
     @PutMapping("{id}/withdraw")
     public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, Double> request){
+        if(!request.containsKey("amount")) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(accountService.withdraw(id, request.get("amount")));
     }
 
