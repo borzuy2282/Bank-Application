@@ -2,6 +2,7 @@ package com.springboot.bankapplication.controller;
 
 import com.springboot.bankapplication.dto.AccountDto;
 import com.springboot.bankapplication.exception.AccountNotFoundException;
+import com.springboot.bankapplication.exception.ErrorDetails;
 import com.springboot.bankapplication.exception.InsufficientAmountException;
 import com.springboot.bankapplication.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -64,16 +67,30 @@ public class AccountController {
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleAccountNotFoundException(AccountNotFoundException ex){
+    public ResponseEntity<ErrorDetails> handleAccountNotFoundException(AccountNotFoundException ex,
+                                                                       WebRequest webRequest){
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                webRequest.getDescription(false),
+                "ACCOUNT_NOT_FOUND"
+        );
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error:", ex.getMessage()));
+                .body(errorDetails);
     }
 
     @ExceptionHandler(InsufficientAmountException.class)
-    public ResponseEntity<Map<String, String>> handleInsufficientAmountException(InsufficientAmountException ex){
+    public ResponseEntity<ErrorDetails> handleInsufficientAmountException(InsufficientAmountException ex,
+                                                                                 WebRequest webRequest){
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                webRequest.getDescription(false),
+                "INSUFFICIENT_AMOUNT"
+        );
         return ResponseEntity
                 .badRequest()
-                .body(Map.of("error:", ex.getMessage()));
+                .body(errorDetails);
     }
 }
